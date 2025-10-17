@@ -805,12 +805,30 @@ p {
   border: 2px dashed var(--primary);
   border-radius: var(--radius-lg);
   transform: scale(1.02);
+  position: relative;
 }
 
 .list.drag-over .list-header {
   background: var(--primary);
   color: white;
   border-radius: var(--radius-lg);
+}
+
+.list.drag-over::after {
+  content: 'Solte aqui';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  z-index: 20;
+  pointer-events: none;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .list-header {
@@ -938,31 +956,55 @@ p {
 }
 
 .card-container.dragging {
-  transform: rotate(5deg) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: rotate(3deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  opacity: 0.9;
+  opacity: 1;
+  cursor: grabbing;
 }
 
 .card-container.dragging .card {
   background: var(--surface);
   border: 2px solid var(--primary);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transform: none;
 }
 
 .card-container.dragging * {
   pointer-events: none;
+  user-select: none;
 }
 
 /* Drop zone styling para cards */
 .card-container.drag-over {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-xl);
+  margin: 0.5rem 0;
 }
 
 .card-container.drag-over .card {
   border-color: var(--primary);
   background: var(--primary-light);
+  opacity: 0.8;
+}
+
+/* Indicador de posição durante drag */
+.list-content.drag-over {
+  position: relative;
+}
+
+.list-content.drag-over::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  z-index: 10;
+  animation: dragIndicator 1.5s ease-in-out infinite;
 }
 
 .card {
@@ -974,7 +1016,12 @@ p {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
+}
+
+.card:active {
+  cursor: grabbing;
 }
 
 .card:hover {
@@ -1911,6 +1958,21 @@ p {
   }
   50% {
     transform: scale(1.05);
+  }
+}
+
+@keyframes dragIndicator {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scaleX(1);
   }
 }
 
