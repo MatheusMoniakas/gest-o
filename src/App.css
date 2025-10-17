@@ -956,23 +956,62 @@ p {
 }
 
 .card-container.dragging {
-  transform: rotate(3deg) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  opacity: 1;
-  cursor: grabbing;
+  transform: rotate(3deg) scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+  z-index: 9999 !important;
+  opacity: 1 !important;
+  cursor: grabbing !important;
+  position: relative !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 .card-container.dragging .card {
-  background: var(--surface);
-  border: 2px solid var(--primary);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  transform: none;
+  background: var(--surface) !important;
+  border: 2px solid var(--primary) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 .card-container.dragging * {
   pointer-events: none;
   user-select: none;
+}
+
+/* Estilos específicos para o portal do react-beautiful-dnd */
+[data-rbd-drag-handle-dragging-id] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  z-index: 9999 !important;
+}
+
+[data-rbd-drag-handle-dragging-id] .card {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--primary) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+  transform: rotate(3deg) scale(1.02) !important;
+}
+
+/* Forçar visibilidade durante drag */
+body [data-rbd-drag-handle-dragging-id] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+body [data-rbd-drag-handle-dragging-id] * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 /* Drop zone styling para cards */
@@ -2004,6 +2043,7 @@ p {
 }
 
 /* Transições suaves para drag and drop */
+/* Transições suaves para drag */
 .card-container.dragging {
   transition: transform 0.2s ease-out;
 }
