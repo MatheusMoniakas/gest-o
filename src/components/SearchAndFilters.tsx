@@ -40,6 +40,7 @@ export function SearchAndFilters() {
       if (filters.dueDate !== 'all') {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
         const thisWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
         switch (filters.dueDate) {
@@ -47,7 +48,7 @@ export function SearchAndFilters() {
             if (!card.dueDate || card.dueDate >= today || card.isCompleted) return false;
             break;
           case 'today':
-            if (!card.dueDate || card.dueDate < today || card.dueDate >= new Date(today.getTime() + 24 * 60 * 60 * 1000)) return false;
+            if (!card.dueDate || card.dueDate < today || card.dueDate >= tomorrow) return false;
             break;
           case 'thisWeek':
             if (!card.dueDate || card.dueDate < today || card.dueDate >= thisWeek) return false;

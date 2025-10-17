@@ -201,6 +201,12 @@ p {
   background: var(--background);
 }
 
+/* Permitir scroll no conteúdo principal */
+.main-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 /* Sidebar moderno */
 .sidebar {
   width: 320px;
@@ -752,6 +758,8 @@ p {
   gap: 1.5rem;
   align-items: flex-start;
   background: linear-gradient(135deg, var(--background) 0%, var(--gray-100) 100%);
+  min-height: 0;
+  scroll-behavior: smooth;
 }
 
 .board-content.drag-over {
@@ -788,6 +796,21 @@ p {
   transform: rotate(3deg) scale(1.02);
   box-shadow: var(--shadow-2xl);
   z-index: 100;
+  opacity: 0.9;
+}
+
+/* Drop zone styling para listas */
+.list.drag-over {
+  background: var(--primary-light);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-lg);
+  transform: scale(1.02);
+}
+
+.list.drag-over .list-header {
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-lg);
 }
 
 .list-header {
@@ -915,9 +938,31 @@ p {
 }
 
 .card-container.dragging {
-  transform: rotate(2deg) scale(1.02);
-  box-shadow: var(--shadow-2xl);
-  z-index: 50;
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0.9;
+}
+
+.card-container.dragging .card {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-container.dragging * {
+  pointer-events: none;
+}
+
+/* Drop zone styling para cards */
+.card-container.drag-over {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-container.drag-over .card {
+  border-color: var(--primary);
+  background: var(--primary-light);
 }
 
 .card {
@@ -926,10 +971,16 @@ p {
   border-radius: var(--radius-xl);
   padding: 1.25rem;
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-normal);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-200);
 }
 
 .card::before {
