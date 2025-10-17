@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card as CardType } from '../types';
 import { useBoard } from '../context/BoardContext';
 import { Edit2, Trash2, X, Check } from 'lucide-react';

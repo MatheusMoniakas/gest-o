@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BoardProvider } from './context/BoardContext';
 import { BoardSelector } from './components/BoardSelector';
 import { Board } from './components/Board';

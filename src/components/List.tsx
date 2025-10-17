@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { List as ListType } from '../types';
 import { useBoard } from '../context/BoardContext';

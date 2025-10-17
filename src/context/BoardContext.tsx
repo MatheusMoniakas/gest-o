@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Board, List, Card, BoardContextType, DragResult } from '../types';
 
 // Estado inicial
@@ -219,7 +219,7 @@ function boardReducer(state: typeof initialState, action: BoardAction) {
       return newState;
 
     case 'MOVE_LIST':
-      const { source: listSource, destination: listDest, draggableId: listId } = action.payload;
+      const { source: listSource, destination: listDest } = action.payload;
       if (!listDest) return state;
 
       const newListState = { ...state };

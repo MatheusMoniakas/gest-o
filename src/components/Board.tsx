@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useBoard } from '../context/BoardContext';
 import { List } from './List';
@@ -22,7 +22,7 @@ export function Board() {
   }
 
   const handleDragEnd = (result: any) => {
-    const { destination, source, draggableId, type } = result;
+    const { destination, source, type } = result;
 
     if (!destination) return;
 
