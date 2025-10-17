@@ -4,12 +4,22 @@ Um clone do Trello construído com React, TypeScript e Vite, oferecendo funciona
 
 ## 🚀 Funcionalidades
 
+### ✨ Funcionalidades Principais
 - **Boards**: Crie e gerencie múltiplos boards
 - **Listas**: Organize tarefas em listas personalizáveis
 - **Cards**: Crie, edite e organize cards com títulos e descrições
 - **Drag & Drop**: Arraste cards entre listas e reordene listas
 - **Interface Responsiva**: Funciona perfeitamente em desktop e mobile
-- **Persistência Local**: Dados salvos no localStorage do navegador
+
+### 🎯 Funcionalidades Avançadas
+- **Etiquetas Coloridas**: Adicione etiquetas coloridas aos cards para organização
+- **Membros**: Atribua membros aos cards com avatares personalizados
+- **Datas de Vencimento**: Defina e gerencie prazos com alertas visuais
+- **Comentários**: Adicione comentários aos cards para colaboração
+- **Status de Conclusão**: Marque cards como concluídos
+- **Busca e Filtros**: Encontre cards rapidamente com busca avançada
+- **Cores de Cobertura**: Personalize cards com cores de fundo
+- **Modal de Detalhes**: Visualização completa dos cards com todas as funcionalidades
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -90,12 +100,28 @@ src/
 - ✅ Excluir cards
 - ✅ Mover cards entre listas (drag & drop)
 - ✅ Reordenar cards dentro da lista
+- ✅ **Etiquetas coloridas** com 10 cores predefinidas
+- ✅ **Membros** com avatares e iniciais
+- ✅ **Datas de vencimento** com alertas visuais
+- ✅ **Comentários** com sistema completo
+- ✅ **Status de conclusão** com toggle
+- ✅ **Cores de cobertura** para personalização
+- ✅ **Modal de detalhes** com todas as funcionalidades
+
+### Busca e Filtros
+- ✅ **Busca por texto** em títulos e descrições
+- ✅ **Filtro por etiquetas** com seleção múltipla
+- ✅ **Filtro por membros** com seleção múltipla
+- ✅ **Filtro por data** (vencidas, hoje, esta semana, concluídas)
+- ✅ **Contador de resultados** em tempo real
 
 ### Interface
 - ✅ Sidebar com seleção de boards
-- ✅ Layout responsivo
+- ✅ Layout responsivo e moderno
 - ✅ Modo mobile otimizado
 - ✅ Feedback visual para ações
+- ✅ Animações suaves e transições
+- ✅ Design inspirado no Trello original
 
 ## 🚀 Próximas Funcionalidades
 

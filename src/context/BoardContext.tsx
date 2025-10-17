@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import { Board, List, Card, BoardContextType, DragResult } from '../types';
+import { Board, List, Card, BoardContextType, DragResult, Label, Member, Comment, Attachment } from '../types';
 
 // Estado inicial
 const initialState = {
@@ -20,10 +20,21 @@ type BoardAction =
   | { type: 'UPDATE_CARD'; payload: { cardId: string; updates: Partial<Card> } }
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'MOVE_CARD'; payload: DragResult }
-  | { type: 'MOVE_LIST'; payload: DragResult };
+  | { type: 'MOVE_LIST'; payload: DragResult }
+  | { type: 'ADD_LABEL_TO_CARD'; payload: { cardId: string; label: Label } }
+  | { type: 'REMOVE_LABEL_FROM_CARD'; payload: { cardId: string; labelId: string } }
+  | { type: 'ADD_MEMBER_TO_CARD'; payload: { cardId: string; member: Member } }
+  | { type: 'REMOVE_MEMBER_FROM_CARD'; payload: { cardId: string; memberId: string } }
+  | { type: 'SET_CARD_DUE_DATE'; payload: { cardId: string; dueDate: Date | null } }
+  | { type: 'TOGGLE_CARD_COMPLETION'; payload: string }
+  | { type: 'ADD_COMMENT'; payload: { cardId: string; comment: Comment } }
+  | { type: 'DELETE_COMMENT'; payload: { cardId: string; commentId: string } }
+  | { type: 'ADD_ATTACHMENT'; payload: { cardId: string; attachment: Attachment } }
+  | { type: 'DELETE_ATTACHMENT'; payload: { cardId: string; attachmentId: string } }
+  | { type: 'SET_CARD_COVER'; payload: { cardId: string; color: string | null } };
 
 // Reducer
-function boardReducer(state: typeof initialState, action: BoardAction) {
+function boardReducer(state: typeof initialState, action: BoardAction): typeof initialState {
   switch (action.type) {
     case 'ADD_BOARD':
       return {
@@ -238,6 +249,347 @@ function boardReducer(state: typeof initialState, action: BoardAction) {
 
       return newListState;
 
+    case 'ADD_LABEL_TO_CARD':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, labels: [...card.labels, action.payload.label], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, labels: [...card.labels, action.payload.label], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'REMOVE_LABEL_FROM_CARD':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, labels: card.labels.filter(label => label.id !== action.payload.labelId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, labels: card.labels.filter(label => label.id !== action.payload.labelId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'ADD_MEMBER_TO_CARD':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, members: [...card.members, action.payload.member], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, members: [...card.members, action.payload.member], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'REMOVE_MEMBER_FROM_CARD':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, members: card.members.filter(member => member.id !== action.payload.memberId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, members: card.members.filter(member => member.id !== action.payload.memberId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'SET_CARD_DUE_DATE':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, dueDate: action.payload.dueDate, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, dueDate: action.payload.dueDate, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'TOGGLE_CARD_COMPLETION':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload
+                ? { ...card, isCompleted: !card.isCompleted, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload
+                ? { ...card, isCompleted: !card.isCompleted, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'ADD_COMMENT':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, comments: [...card.comments, action.payload.comment], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, comments: [...card.comments, action.payload.comment], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'DELETE_COMMENT':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, comments: card.comments.filter(comment => comment.id !== action.payload.commentId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, comments: card.comments.filter(comment => comment.id !== action.payload.commentId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'ADD_ATTACHMENT':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, attachments: [...card.attachments, action.payload.attachment], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, attachments: [...card.attachments, action.payload.attachment], updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'DELETE_ATTACHMENT':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, attachments: card.attachments.filter(attachment => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, attachments: card.attachments.filter(attachment => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
+    case 'SET_CARD_COVER':
+      return {
+        ...state,
+        boards: state.boards.map(board => ({
+          ...board,
+          lists: board.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, coverColor: action.payload.color, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        })),
+        currentBoard: state.currentBoard ? {
+          ...state.currentBoard,
+          lists: state.currentBoard.lists.map(list => ({
+            ...list,
+            cards: list.cards.map(card =>
+              card.id === action.payload.cardId
+                ? { ...card, coverColor: action.payload.color, updatedAt: new Date() }
+                : card
+            ),
+            updatedAt: new Date(),
+          })),
+          updatedAt: new Date(),
+        } : null,
+      };
+
     default:
       return state;
   }
@@ -301,7 +653,12 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       title,
       description,
       listId,
-      position: state.currentBoard?.lists.find(l => l.id === listId)?.cards.length || 0,
+      position: state.currentBoard?.lists.find((l: List) => l.id === listId)?.cards.length || 0,
+      labels: [],
+      members: [],
+      isCompleted: false,
+      comments: [],
+      attachments: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -324,6 +681,50 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'MOVE_LIST', payload: result });
   };
 
+  const addLabelToCard = (cardId: string, label: Label) => {
+    dispatch({ type: 'ADD_LABEL_TO_CARD', payload: { cardId, label } });
+  };
+
+  const removeLabelFromCard = (cardId: string, labelId: string) => {
+    dispatch({ type: 'REMOVE_LABEL_FROM_CARD', payload: { cardId, labelId } });
+  };
+
+  const addMemberToCard = (cardId: string, member: Member) => {
+    dispatch({ type: 'ADD_MEMBER_TO_CARD', payload: { cardId, member } });
+  };
+
+  const removeMemberFromCard = (cardId: string, memberId: string) => {
+    dispatch({ type: 'REMOVE_MEMBER_FROM_CARD', payload: { cardId, memberId } });
+  };
+
+  const setCardDueDate = (cardId: string, dueDate: Date | null) => {
+    dispatch({ type: 'SET_CARD_DUE_DATE', payload: { cardId, dueDate } });
+  };
+
+  const toggleCardCompletion = (cardId: string) => {
+    dispatch({ type: 'TOGGLE_CARD_COMPLETION', payload: cardId });
+  };
+
+  const addComment = (cardId: string, comment: Comment) => {
+    dispatch({ type: 'ADD_COMMENT', payload: { cardId, comment } });
+  };
+
+  const deleteComment = (cardId: string, commentId: string) => {
+    dispatch({ type: 'DELETE_COMMENT', payload: { cardId, commentId } });
+  };
+
+  const addAttachment = (cardId: string, attachment: Attachment) => {
+    dispatch({ type: 'ADD_ATTACHMENT', payload: { cardId, attachment } });
+  };
+
+  const deleteAttachment = (cardId: string, attachmentId: string) => {
+    dispatch({ type: 'DELETE_ATTACHMENT', payload: { cardId, attachmentId } });
+  };
+
+  const setCardCover = (cardId: string, color: string | null) => {
+    dispatch({ type: 'SET_CARD_COVER', payload: { cardId, color } });
+  };
+
   const value: BoardContextType = {
     boards: state.boards,
     currentBoard: state.currentBoard,
@@ -339,6 +740,17 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     deleteCard,
     moveCard,
     moveList,
+    addLabelToCard,
+    removeLabelFromCard,
+    addMemberToCard,
+    removeMemberFromCard,
+    setCardDueDate,
+    toggleCardCompletion,
+    addComment,
+    deleteComment,
+    addAttachment,
+    deleteAttachment,
+    setCardCover,
   };
 
   return (

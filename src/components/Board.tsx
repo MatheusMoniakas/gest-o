@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { useBoard } from '../context/BoardContext';
 import { List } from './List';
+import { SearchAndFilters } from './SearchAndFilters';
 import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
 
 export function Board() {
@@ -121,6 +122,8 @@ export function Board() {
           </div>
         )}
       </div>
+
+      <SearchAndFilters />
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="LIST" direction="horizontal">

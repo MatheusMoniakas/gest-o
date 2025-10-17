@@ -1,9 +1,47 @@
+export interface Label {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface Member {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  initials: string;
+}
+
+export interface Comment {
+  id: string;
+  text: string;
+  authorId: string;
+  authorName: string;
+  createdAt: Date;
+}
+
+export interface Attachment {
+  id: string;
+  name: string;
+  url: string;
+  type: 'image' | 'file';
+  size: number;
+  uploadedAt: Date;
+}
+
 export interface Card {
   id: string;
   title: string;
   description?: string;
   listId: string;
   position: number;
+  labels: Label[];
+  members: Member[];
+  dueDate?: Date | null;
+  isCompleted: boolean;
+  comments: Comment[];
+  attachments: Attachment[];
+  coverColor?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,4 +93,15 @@ export interface BoardContextType {
   deleteCard: (cardId: string) => void;
   moveCard: (result: DragResult) => void;
   moveList: (result: DragResult) => void;
+  addLabelToCard: (cardId: string, label: Label) => void;
+  removeLabelFromCard: (cardId: string, labelId: string) => void;
+  addMemberToCard: (cardId: string, member: Member) => void;
+  removeMemberFromCard: (cardId: string, memberId: string) => void;
+  setCardDueDate: (cardId: string, dueDate: Date | null) => void;
+  toggleCardCompletion: (cardId: string) => void;
+  addComment: (cardId: string, comment: Comment) => void;
+  deleteComment: (cardId: string, commentId: string) => void;
+  addAttachment: (cardId: string, attachment: Attachment) => void;
+  deleteAttachment: (cardId: string, attachmentId: string) => void;
+  setCardCover: (cardId: string, color: string | null) => void;
 }
