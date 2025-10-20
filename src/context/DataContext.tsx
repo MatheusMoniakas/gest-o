@@ -194,6 +194,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (currentBoard?.id === id) {
         setCurrentBoard(prev => prev ? { ...prev, ...updates } : null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao atualizar board' }
     }
@@ -213,6 +215,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (currentBoard?.id === id) {
         setCurrentBoard(null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao deletar board' }
     }
@@ -285,6 +289,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           )
         } : null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao atualizar lista' }
     }
@@ -310,6 +316,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           lists: prev.lists.filter(list => list.id !== id)
         } : null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao deletar lista' }
     }
@@ -401,6 +409,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           }))
         } : null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao atualizar card' }
     }
@@ -432,6 +442,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           }))
         } : null)
       }
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao deletar card' }
     }
@@ -452,6 +464,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       // Recarregar dados para sincronizar
       await loadBoards()
+
+      return {}
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'Erro ao mover card' }
     }

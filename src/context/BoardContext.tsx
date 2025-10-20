@@ -515,7 +515,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: [...card.attachments, action.payload.attachment], updatedAt: new Date() }
+                ? { ...card, attachments: (card.attachments || 0) + 1, updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
@@ -528,7 +528,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: [...card.attachments, action.payload.attachment], updatedAt: new Date() }
+                ? { ...card, attachments: (card.attachments || 0) + 1, updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
@@ -546,7 +546,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: (card.attachments || []).filter((attachment: any) => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                ? { ...card, attachments: Math.max(0, (card.attachments || 0) - 1), updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
@@ -559,7 +559,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: (card.attachments || []).filter((attachment: any) => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                ? { ...card, attachments: Math.max(0, (card.attachments || 0) - 1), updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
