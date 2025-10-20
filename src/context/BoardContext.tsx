@@ -1,7 +1,7 @@
-import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { Board, List, Card, BoardContextType, DragResult, Label, Member, Comment, Attachment } from '../types';
 
-// Estado inicial
+// Estado inicial limpo - sem dados pré-prontos
 const initialState = {
   boards: [] as Board[],
   currentBoard: null as Board | null,
@@ -201,29 +201,38 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
       if (!destination) return state;
 
       const newState = { ...state };
-      const sourceList = newState.currentBoard?.lists.find(list => list.id === source.droppableId);
-      const destList = newState.currentBoard?.lists.find(list => list.id === destination.droppableId);
+      
+      if (newState.currentBoard) {
+        const sourceList = newState.currentBoard.lists.find(list => list.id === source.droppableId);
+        const destList = newState.currentBoard.lists.find(list => list.id === destination.droppableId);
 
-      if (sourceList && destList) {
-        const card = sourceList.cards.find(c => c.id === draggableId);
-        if (card) {
-          // Remove da lista origem
-          sourceList.cards = sourceList.cards.filter(c => c.id !== draggableId);
-          
-          // Adiciona na lista destino
-          destList.cards.splice(destination.index, 0, {
-            ...card,
-            listId: destination.droppableId,
-            updatedAt: new Date(),
-          });
+        if (sourceList && destList) {
+          const card = sourceList.cards.find(c => c.id === draggableId);
+          if (card) {
+            // Remove da lista origem
+            sourceList.cards = sourceList.cards.filter(c => c.id !== draggableId);
+            
+            // Adiciona na lista destino
+            const updatedCard = {
+              ...card,
+              listId: destination.droppableId,
+              position: destination.index,
+              updatedAt: new Date(),
+            };
+            
+            destList.cards.splice(destination.index, 0, updatedCard);
 
-          // Atualiza posições
-          sourceList.cards.forEach((c, index) => {
-            c.position = index;
-          });
-          destList.cards.forEach((c, index) => {
-            c.position = index;
-          });
+            // Atualiza posições de todas as listas afetadas
+            sourceList.cards.forEach((c, index) => {
+              c.position = index;
+            });
+            destList.cards.forEach((c, index) => {
+              c.position = index;
+            });
+
+            // Atualiza o timestamp do board
+            newState.currentBoard.updatedAt = new Date();
+          }
         }
       }
 
@@ -612,6 +621,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       updatedAt: new Date(),
     };
     dispatch({ type: 'ADD_BOARD', payload: newBoard });
+    dispatch({ type: 'SET_CURRENT_BOARD', payload: newBoard });
   };
 
   const updateBoard = (id: string, updates: Partial<Board>) => {
@@ -752,6 +762,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     deleteAttachment,
     setCardCover,
   };
+
 
   return (
     <BoardContext.Provider value={value}>

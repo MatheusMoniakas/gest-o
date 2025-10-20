@@ -1,44 +1,99 @@
-import { useState } from 'react';
-import { BoardProvider } from './context/BoardContext';
-import { BoardSelector } from './components/BoardSelector';
-import { Board } from './components/Board';
-import { Menu, X } from 'lucide-react';
-import './App.css';
+import { useState } from 'react'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import { DataProvider } from './context/DataContext'
+import { Board } from './components/Board'
+import { AuthModal } from './components/Auth/AuthModal'
+import { UserProfile } from './components/UserProfile'
+import { User, LogIn } from 'lucide-react'
+import './App.css'
 
-function App() {
-  const [showSidebar, setShowSidebar] = useState(true);
+function AppContent() {
+  const { user, loading } = useAuth()
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
 
-  return (
-    <BoardProvider>
+  if (loading) {
+    return (
       <div className="app">
-        <div className={`sidebar ${showSidebar ? 'open' : 'closed'}`}>
-          <div className="sidebar-header">
-            <h1>Trello Clone</h1>
-            <button
-              onClick={() => setShowSidebar(false)}
-              className="btn-close-sidebar"
+        <div className="loading-screen">
+          <div className="loading-spinner"></div>
+          <p>Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="app">
+        <div className="welcome-screen">
+          <div className="welcome-content">
+            <h1>Kanban Board</h1>
+            <h2>Organize suas tarefas de forma visual</h2>
+            <p>
+              Crie boards personalizados, organize tarefas em listas e acompanhe o progresso 
+              com um sistema visual intuitivo e moderno.
+            </p>
+            <button 
+              onClick={() => setShowAuthModal(true)}
+              className="btn-primary"
             >
-              <X size={20} />
+              <LogIn size={20} />
+              Entrar / Criar conta
             </button>
           </div>
-          <BoardSelector />
         </div>
+        
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      </div>
+    )
+  }
 
+  return (
+    <DataProvider>
+      <div className="app">
         <div className="main-content">
           <div className="main-header">
-            <button
-              onClick={() => setShowSidebar(true)}
-              className="btn-open-sidebar"
-            >
-              <Menu size={20} />
-            </button>
-            <h2>Gerenciador de Tarefas</h2>
+            <h2 className="header-title">Kanban Board</h2>
+            <div className="header-actions">
+              <button
+                onClick={() => setShowUserProfile(true)}
+                className="user-button"
+              >
+                <User size={20} />
+                {user.user_metadata?.full_name || 'Usuário'}
+              </button>
+            </div>
           </div>
           <Board />
         </div>
+        
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+        
+        {showUserProfile && (
+          <div className="modal-overlay" onClick={() => setShowUserProfile(false)}>
+            <div className="modal-content user-profile-modal" onClick={(e) => e.stopPropagation()}>
+              <UserProfile onClose={() => setShowUserProfile(false)} />
+            </div>
+          </div>
+        )}
       </div>
-    </BoardProvider>
-  );
+    </DataProvider>
+  )
 }
 
-export default App;
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
+}
+
+export default App

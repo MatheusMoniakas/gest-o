@@ -1,24 +1,65 @@
 import { useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { useBoard } from '../context/BoardContext';
+import { useData } from '../context/DataContext';
 import { List } from './List';
-import { SearchAndFilters } from './SearchAndFilters';
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { CreateBoardModal } from './CreateBoardModal';
+import { Plus } from 'lucide-react';
 
 export function Board() {
-  const { currentBoard, addList, updateBoard, deleteBoard, moveCard, moveList } = useBoard();
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const { currentBoard, boards, createBoard, createList, setCurrentBoard, loading } = useData();
   const [isAddingList, setIsAddingList] = useState(false);
-  const [boardTitle, setBoardTitle] = useState(currentBoard?.title || '');
-  const [boardDescription, setBoardDescription] = useState(currentBoard?.description || '');
   const [listTitle, setListTitle] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const handleCreateBoard = async (title: string, description?: string) => {
+    const { data, error } = await createBoard(title, description);
+    if (data) {
+      setCurrentBoard(data);
+    }
+  };
 
   if (!currentBoard) {
     return (
-      <div className="no-board">
-        <h2>Nenhum board selecionado</h2>
-        <p>Selecione um board existente ou crie um novo.</p>
-      </div>
+      <>
+        <div className="no-board">
+          <div className="no-board-content">
+            <h1>Kanban</h1>
+            <h2>Organize suas tarefas de forma visual</h2>
+            <p>
+              Crie boards personalizados, organize tarefas em listas e acompanhe o progresso 
+              com um sistema visual intuitivo e moderno.
+            </p>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="btn-create-board"
+            >
+              <Plus size={20} />
+              Criar Primeiro Board
+            </button>
+            
+            <div className="welcome-features">
+              <div className="feature-card">
+                <h3>📋 Organize</h3>
+                <p>Crie listas personalizadas para organizar suas tarefas</p>
+              </div>
+              <div className="feature-card">
+                <h3>🎯 Foque</h3>
+                <p>Mantenha o foco com um sistema visual claro</p>
+              </div>
+              <div className="feature-card">
+                <h3>🚀 Produza</h3>
+                <p>Aumente sua produtividade com organização visual</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <CreateBoardModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onCreateBoard={handleCreateBoard}
+        />
+      </>
     );
   }
 
@@ -38,11 +79,13 @@ export function Board() {
     }
   };
 
-  const handleAddList = () => {
-    if (listTitle.trim()) {
-      addList(currentBoard.id, listTitle.trim());
-      setListTitle('');
-      setIsAddingList(false);
+  const handleAddList = async () => {
+    if (listTitle.trim() && currentBoard) {
+      const { error } = await createList(currentBoard.id, listTitle.trim());
+      if (!error) {
+        setListTitle('');
+        setIsAddingList(false);
+      }
     }
   };
 
@@ -51,80 +94,8 @@ export function Board() {
     setIsAddingList(false);
   };
 
-  const handleSaveBoard = () => {
-    if (boardTitle.trim()) {
-      updateBoard(currentBoard.id, { 
-        title: boardTitle.trim(), 
-        description: boardDescription.trim() || undefined 
-      });
-      setIsEditingTitle(false);
-    }
-  };
-
-  const handleCancelEditBoard = () => {
-    setBoardTitle(currentBoard.title);
-    setBoardDescription(currentBoard.description || '');
-    setIsEditingTitle(false);
-  };
-
-  const handleDeleteBoard = () => {
-    if (window.confirm('Tem certeza que deseja excluir este board? Todas as listas e cards serão removidos.')) {
-      deleteBoard(currentBoard.id);
-    }
-  };
-
   return (
-    <div className="board">
-      <div className="board-header">
-        {isEditingTitle ? (
-          <div className="board-title-edit">
-            <input
-              type="text"
-              value={boardTitle}
-              onChange={(e) => setBoardTitle(e.target.value)}
-              className="board-title-input"
-              autoFocus
-            />
-            <textarea
-              value={boardDescription}
-              onChange={(e) => setBoardDescription(e.target.value)}
-              className="board-description-input"
-              placeholder="Descrição do board (opcional)"
-              rows={2}
-            />
-            <div className="board-title-actions">
-              <button onClick={handleSaveBoard} className="btn-save">
-                <Check size={16} />
-                Salvar
-              </button>
-              <button onClick={handleCancelEditBoard} className="btn-cancel">
-                <X size={16} />
-                Cancelar
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="board-title-container">
-            <div className="board-title-info">
-              <h1 className="board-title">{currentBoard.title}</h1>
-              {currentBoard.description && (
-                <p className="board-description">{currentBoard.description}</p>
-              )}
-            </div>
-            <div className="board-actions">
-              <button onClick={() => setIsEditingTitle(true)} className="btn-edit" title="Editar board">
-                <Edit2 size={16} />
-              </button>
-              <button onClick={handleDeleteBoard} className="btn-delete" title="Excluir board">
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <SearchAndFilters />
-
+    <>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" type="LIST" direction="horizontal">
           {(provided, snapshot) => (
@@ -170,6 +141,12 @@ export function Board() {
           )}
         </Droppable>
       </DragDropContext>
-    </div>
+      
+      <CreateBoardModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateBoard={handleCreateBoard}
+      />
+    </>
   );
 }

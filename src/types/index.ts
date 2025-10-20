@@ -35,12 +35,17 @@ export interface Card {
   description?: string;
   listId: string;
   position: number;
-  labels: Label[];
-  members: Member[];
+  labels?: Label[];
+  members?: Member[];
   dueDate?: Date | null;
   isCompleted: boolean;
-  comments: Comment[];
-  attachments: Attachment[];
+  comments?: Comment[];
+  attachments?: number;
+  assignee?: string;
+  checklist?: {
+    completed: number;
+    total: number;
+  };
   coverColor?: string | null;
   createdAt: Date;
   updatedAt: Date;

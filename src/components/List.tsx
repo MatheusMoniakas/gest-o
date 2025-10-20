@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { List as ListType } from '../types';
-import { useBoard } from '../context/BoardContext';
+import { useData } from '../context/DataContext';
 import { Card } from './Card';
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { Plus, MoreHorizontal } from 'lucide-react';
 
 interface ListProps {
   list: ListType;
@@ -12,42 +12,42 @@ interface ListProps {
 
 export function List({ list, index }: ListProps) {
   const [isAddingCard, setIsAddingCard] = useState(false);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
-  const [cardDescription, setCardDescription] = useState('');
-  const [listTitle, setListTitle] = useState(list.title);
-  const { addCard, updateList, deleteList } = useBoard();
+  const { createCard, moveCard } = useData();
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
     if (cardTitle.trim()) {
-      addCard(list.id, cardTitle.trim(), cardDescription.trim() || undefined);
-      setCardTitle('');
-      setCardDescription('');
-      setIsAddingCard(false);
+      const { error } = await createCard(list.id, cardTitle.trim());
+      if (!error) {
+        setCardTitle('');
+        setIsAddingCard(false);
+      }
     }
   };
 
   const handleCancelAddCard = () => {
     setCardTitle('');
-    setCardDescription('');
     setIsAddingCard(false);
   };
 
-  const handleSaveTitle = () => {
-    if (listTitle.trim()) {
-      updateList(list.id, { title: listTitle.trim() });
-      setIsEditingTitle(false);
-    }
+  const handleDragStart = (cardId: string) => {
+    // Adicionar classe de drag ativo na lista
+    const listElement = document.querySelector(`[data-list-id="${list.id}"]`);
+    listElement?.classList.add('drag-active');
   };
 
-  const handleCancelEditTitle = () => {
-    setListTitle(list.title);
-    setIsEditingTitle(false);
-  };
-
-  const handleDeleteList = () => {
-    if (window.confirm('Tem certeza que deseja excluir esta lista? Todos os cards serão removidos.')) {
-      deleteList(list.id);
+  const handleDragEnd = (cardId: string, targetListId?: string) => {
+    // Remover classe de drag ativo
+    const listElement = document.querySelector(`[data-list-id="${list.id}"]`);
+    listElement?.classList.remove('drag-active');
+    
+    if (targetListId && targetListId !== list.id) {
+      // Mover card para outra lista
+      moveCard({
+        draggableId: cardId,
+        source: { droppableId: list.id, index: 0 },
+        destination: { droppableId: targetListId, index: 0 }
+      });
     }
   };
 
@@ -58,63 +58,54 @@ export function List({ list, index }: ListProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           className={`list ${snapshot.isDragging ? 'dragging' : ''}`}
+          data-list-id={list.id}
         >
           <div className="list-header" {...provided.dragHandleProps}>
-            {isEditingTitle ? (
-              <div className="list-title-edit">
-                <input
-                  type="text"
-                  value={listTitle}
-                  onChange={(e) => setListTitle(e.target.value)}
-                  className="list-title-input"
-                  autoFocus
-                />
-                <div className="list-title-actions">
-                  <button onClick={handleSaveTitle} className="btn-save" title="Salvar">
-                    <Check size={14} />
-                  </button>
-                  <button onClick={handleCancelEditTitle} className="btn-cancel" title="Cancelar">
-                    <X size={14} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="list-title-container">
-                <h3 className="list-title">{list.title}</h3>
-                <div className="list-actions">
-                  <button onClick={() => setIsEditingTitle(true)} className="btn-edit" title="Editar título">
-                    <Edit2 size={14} />
-                  </button>
-                  <button onClick={handleDeleteList} className="btn-delete" title="Excluir lista">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="list-title-container">
+              <h3 className="list-title">{list.title}</h3>
+              <button className="list-action" title="Mais opções">
+                <MoreHorizontal size={16} />
+              </button>
+            </div>
           </div>
 
-          <Droppable droppableId={list.id} type="CARD">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={`list-content ${snapshot.isDraggingOver ? 'drag-over' : ''}`}
-              >
+          <div
+            className="list-content"
+            data-list-id={list.id}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.add('drag-over');
+            }}
+            onDragLeave={(e) => {
+              e.currentTarget.classList.remove('drag-over');
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove('drag-over');
+              
+              const cardId = e.dataTransfer.getData('text/plain');
+              if (cardId && cardId !== list.id) {
+                // Mover card para esta lista
+                moveCard({
+                  draggableId: cardId,
+                  source: { droppableId: '', index: 0 },
+                  destination: { droppableId: list.id, index: 0 }
+                });
+              }
+            }}
+          >
                 {list.cards.map((card, cardIndex) => (
-                  <Draggable key={card.id} draggableId={card.id} index={cardIndex}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={`card-container ${snapshot.isDragging ? 'dragging' : ''}`}
-                      >
-                        <Card card={card} />
-                      </div>
-                    )}
-                  </Draggable>
+                  <div
+                    key={card.id}
+                    className="card-container"
+                  >
+                    <Card 
+                      card={card} 
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                    />
+                  </div>
                 ))}
-                {provided.placeholder}
 
                 {isAddingCard ? (
                   <div className="add-card-form">
@@ -122,22 +113,15 @@ export function List({ list, index }: ListProps) {
                       type="text"
                       value={cardTitle}
                       onChange={(e) => setCardTitle(e.target.value)}
-                      className="card-title-input"
+                      className="add-card-input"
                       placeholder="Título do card"
                       autoFocus
                     />
-                    <textarea
-                      value={cardDescription}
-                      onChange={(e) => setCardDescription(e.target.value)}
-                      className="card-description-input"
-                      placeholder="Descrição (opcional)"
-                      rows={2}
-                    />
                     <div className="add-card-actions">
-                      <button onClick={handleAddCard} className="btn-add">
+                      <button onClick={handleAddCard} className="add-card-btn-primary">
                         Adicionar Card
                       </button>
-                      <button onClick={handleCancelAddCard} className="btn-cancel">
+                      <button onClick={handleCancelAddCard} className="add-card-btn-secondary">
                         Cancelar
                       </button>
                     </div>
@@ -151,9 +135,7 @@ export function List({ list, index }: ListProps) {
                     Adicionar um card
                   </button>
                 )}
-              </div>
-            )}
-          </Droppable>
+          </div>
         </div>
       )}
     </Draggable>
