@@ -137,7 +137,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       const formattedBoards = boardsData?.map(board => ({
         ...board,
-        lists: board.lists?.map(list => ({
+        lists: board.lists?.map((list: any) => ({
           ...list,
           cards: list.cards || []
         })) || []
@@ -437,7 +437,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const moveCard = async (cardId: string, fromListId: string, toListId: string, newPosition: number) => {
+  const moveCard = async (cardId: string, _fromListId: string, toListId: string, newPosition: number) => {
     try {
       // Atualizar posição do card
       const { error } = await supabase
@@ -485,4 +485,5 @@ export function useData() {
   }
   return context
 }
+
 

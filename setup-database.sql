@@ -214,3 +214,4 @@ CREATE INDEX IF NOT EXISTS idx_cards_position ON cards(position);
 -- UPDATE auth.config SET enable_signup = true;
 -- UPDATE auth.config SET enable_email_confirmations = false;
 
+

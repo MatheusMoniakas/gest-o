@@ -546,7 +546,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: card.attachments.filter(attachment => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                ? { ...card, attachments: (card.attachments || []).filter((attachment: any) => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
@@ -559,7 +559,7 @@ function boardReducer(state: typeof initialState, action: BoardAction): typeof i
             ...list,
             cards: list.cards.map(card =>
               card.id === action.payload.cardId
-                ? { ...card, attachments: card.attachments.filter(attachment => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
+                ? { ...card, attachments: (card.attachments || []).filter((attachment: any) => attachment.id !== action.payload.attachmentId), updatedAt: new Date() }
                 : card
             ),
             updatedAt: new Date(),
@@ -668,7 +668,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       members: [],
       isCompleted: false,
       comments: [],
-      attachments: [],
+      attachments: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
